@@ -1,3 +1,5 @@
+# Rename to config.py
+
 WIFI_ESSID = b'essid_here'
 WIFI_PASSWORD = b'password_here'
 

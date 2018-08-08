@@ -1,48 +1,17 @@
 import machine
-import network
 import utime
 import ujson
 
-from umqtt.robust import MQTTClient
-from ubinascii import hexlify
-
 import config
 import commands
+import setup
 
-
-mqtt = None
-wlan = None
+# not constants, but uppercase...
 PWM = {}
 STATUS = {}
 
 
-def setup_wifi():
-    global wlan
-    wlan = network.WLAN(network.STA_IF)
-    wlan.active(True)
-    wlan.connect(config.WIFI_ESSID, config.WIFI_PASSWORD)
-
-    while not wlan.isconnected():
-        machine.idle()
-
-    print('connected: {}'.format(wlan.ifconfig()[0]))
-
-
-def setup_mqtt(cb):
-    config.MQTT_CLIENT_ID = hexlify(machine.unique_id())
-    config.MQTT_TOPIC = config.MQTT_TOPIC + config.MQTT_CLIENT_ID
-
-    global mqtt
-    mqtt = MQTTClient(config.MQTT_CLIENT_ID, config.MQTT_HOST)
-    mqtt.set_last_will(config.MQTT_TOPIC + b'/info', b'offline')
-    mqtt.set_callback(cb)
-
-    mqtt.connect()
-    mqtt.subscribe(config.MQTT_TOPIC + b'/#')
-    mqtt.publish(config.MQTT_TOPIC + b'/info', b'online')
-
-
-def setup_pins():
+def init_pins():
     for color, pin in config.RGB_PINOUT.items():
         machine.Pin(pin, machine.Pin.OUT, value=1)
 
@@ -51,8 +20,8 @@ def setup_pins():
 
         STATUS[color] = {
             'state': '',
-            'final': 0,         # final PWM after dimming process
-            'current': 0,       # current PWM
+            'final': 0,         # final pwm after dimming process
+            'current': 0,       # current pwm
             'last': 1023,       # last color (after brightness correction)
             'original': 1023,   # last color (without brightness correction)
         }
@@ -63,7 +32,7 @@ def setup_pins():
     }
 
 
-def callback(topic, msg):
+def mqtt_callback(topic, msg):
     # topic and msg are bytes
     print(('callback', topic, msg))
     words = topic.split(b'/')
@@ -95,7 +64,7 @@ def callback(topic, msg):
                     obj['brightness'] = STATUS[color]['final'] / 4
 
                 if obj:
-                    mqtt.publish(
+                    setup.mqtt.publish(
                         config.MQTT_TOPIC + b'/' + words[-2] + b'/status',
                         ujson.dumps(obj)
                     )
@@ -146,14 +115,18 @@ def callback(topic, msg):
                                 STATUS[color]['final'] = 0
 
                 if obj:
-                    mqtt.publish(
+                    setup.mqtt.publish(
                         config.MQTT_TOPIC + b'/rgb/status',
                         ujson.dumps(obj)
                     )
 
         # ------------------------------ command ------------------------------
         elif words[-1] == b'cmd':
-            commands.process(msg, mqtt)
+            commands.process_cmd(msg, setup.mqtt)
+
+        # --------------------------- file download ---------------------------
+        elif words[-1] == b'file':
+            commands.process_file(msg, setup.mqtt)
 
 
 def change_pins():
@@ -181,17 +154,27 @@ def change_pins():
     return changed
 
 
+def timer_callback(p=None):
+    setup.mqtt.ping()
+
+
 def main():
     try:
-        setup_pins()
-        setup_wifi()
-        setup_mqtt(callback)
+        init_pins()
+        setup.ap_off()
+        setup.sta_on()
+        setup.mqtt(mqtt_callback)
+
+        t1 = machine.Timer(1)
+        t1.init(
+            period=60000, mode=machine.Timer.PERIODIC, callback=timer_callback
+        )
 
         while True:
-            if not wlan.isconnected():
-                setup_wifi()
+            if not setup.wlan.isconnected():
+                setup.sta_on()
 
-            mqtt.check_msg()
+            setup.mqtt.check_msg()
 
             if not change_pins():
                 machine.idle()
