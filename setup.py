@@ -40,3 +40,11 @@ def mqtt(cb):
     mqtt.connect()
     mqtt.subscribe(config.MQTT_TOPIC + b'/#')
     mqtt.publish(config.MQTT_TOPIC + b'/info', b'online', retain=True)
+
+    def timer_callback(p=None):
+        mqtt.ping()
+
+    t1 = machine.Timer(1)
+    t1.init(
+        period=60000, mode=machine.Timer.PERIODIC, callback=timer_callback
+    )

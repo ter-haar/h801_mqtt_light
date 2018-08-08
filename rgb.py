@@ -154,21 +154,12 @@ def change_pins():
     return changed
 
 
-def timer_callback(p=None):
-    setup.mqtt.ping()
-
-
 def main():
     try:
         init_pins()
         setup.ap_off()
         setup.sta_on()
         setup.mqtt(mqtt_callback)
-
-        t1 = machine.Timer(1)
-        t1.init(
-            period=60000, mode=machine.Timer.PERIODIC, callback=timer_callback
-        )
 
         while True:
             if not setup.wlan.isconnected():
