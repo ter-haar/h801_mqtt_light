@@ -165,7 +165,7 @@ def main():
             if not setup.wlan.isconnected():
                 setup.sta_on()
 
-            setup.mqtt.check_msg()
+            setup.mqtt.loop()
 
             if not change_pins():
                 machine.idle()

@@ -1,7 +1,8 @@
 import machine
 import network
+import utime
 
-from umqtt.robust import MQTTClient
+from umqtt import simple
 from ubinascii import hexlify
 
 import config
@@ -9,6 +10,18 @@ import config
 
 mqtt = None
 wlan = None
+
+
+class MQTTClient(simple.MQTTClient):
+
+    last_msg_sent_time = 0
+
+    def loop(self):
+        if utime.time() > self.last_msg_sent_time + self.keepalive:
+            self.ping()
+            self.last_msg_sent_time = utime.time()
+
+        self.check_msg()
 
 
 def ap_off():
@@ -33,18 +46,12 @@ def mqtt(cb):
     config.MQTT_TOPIC = config.MQTT_TOPIC + config.MQTT_CLIENT_ID
 
     global mqtt
-    mqtt = MQTTClient(config.MQTT_CLIENT_ID, config.MQTT_HOST, keepalive=120)
+    mqtt = MQTTClient(config.MQTT_CLIENT_ID, config.MQTT_HOST, keepalive=30)
+    mqtt.DEBUG = True
     mqtt.set_last_will(config.MQTT_TOPIC + b'/info', b'offline', retain=True)
     mqtt.set_callback(cb)
 
     mqtt.connect()
     mqtt.subscribe(config.MQTT_TOPIC + b'/#')
     mqtt.publish(config.MQTT_TOPIC + b'/info', b'online', retain=True)
-
-    def timer_callback(p=None):
-        mqtt.ping()
-
-    t1 = machine.Timer(1)
-    t1.init(
-        period=60000, mode=machine.Timer.PERIODIC, callback=timer_callback
-    )
+    print("mqtt connected")
