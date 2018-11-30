@@ -57,6 +57,8 @@ home/light/E801-42602f00/info online
 home/light/E801-42602f00/ip 192.168.24.102
 ```
 42602f00 to id Twojego esp8266, więc pewnie będzie inne....
+
+-------------------
 No dobrze, mamy działającego wemosa. Ale chcieliśmy H801! Teraz więc sprytna sztuczka
 
 11) zgraj zawartość flasha z wemosa do pliku
