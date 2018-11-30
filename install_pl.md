@@ -1,11 +1,4 @@
-# H801 vs micropython
-## Kolejny sterownik RGB led oparty na mqtt.
-
-Po co? Bo żaden z tych które znalazłem nie miał tego co potrzebowałem. Sterownik jest przeznaczony głównie dla H801 WiFi (ale może działać na dowolnym układzie opartym o esp8266) i pozwala sterować niezależnie każdym z kanałów. Można więc zapalić podłączyć pasek rgb i sterować nim, a zupełnie osobno sterować jeszcze dwoma paskami mono. Albo sterować osobno 5 paskami monohromatycznymi.
-
-Kod jest napisany w pythonie - chciałem sprawdzić jak python poradzi sobie w IoT na układzie z tak ograniczonymi zasobami.
-
--------------------
+## H801 vs micropython
 
 Do uruchomienia sterownika potrzebny jest micropython:
 1) pobierz plik bin ze strony https://micropython.org/download#esp8266 (na ten moment najnowszy to esp8266-20180511-v1.9.4.bin)
