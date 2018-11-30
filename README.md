@@ -6,6 +6,6 @@ Po co? Bo żaden z tych które znalazłem nie miał tego co potrzebowałem. Ster
 Kod jest napisany w pythonie - chciałem sprawdzić jak python poradzi sobie w IoT na układzie z tak ograniczonymi zasobami.
 
 -------------------
-[Opis instalacji](install_pl.md)
-[Konfiguracja HomeAssistanta](hass_pl.md)
-[Mqtt](mqtt_pl.md)
+* [Opis instalacji](install_pl.md)
+* [Konfiguracja HomeAssistanta](hass_pl.md)
+* [Mqtt](mqtt_pl.md)
