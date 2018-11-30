@@ -5,6 +5,8 @@ Po co? Bo żaden z tych które znalazłem nie miał tego co potrzebowałem. Ster
 
 Kod jest napisany w pythonie - chciałem sprawdzić jak python poradzi sobie w IoT na układzie z tak ograniczonymi zasobami.
 
+-------------------
+
 Do uruchomienia sterownika potrzebny jest micropython:
 1) pobierz plik bin ze strony https://micropython.org/download#esp8266 (na ten moment najnowszy to esp8266-20180511-v1.9.4.bin)
 
@@ -24,6 +26,7 @@ esptool.py --port /dev/ttyUSB0 write_flash -fm dio 0x00000 esp8266-20180511-v1.9
 ```
 for n in *.py; do ampy --port /dev/ttyUSB0 put $n; done
 ```
+
 7) sprawdz czy wszystkie pliki zostały wgrane
 ```
 ampy --port /dev/ttyUSB0 put
@@ -36,10 +39,12 @@ ampy --port /dev/ttyUSB0 put
 /rgb.py
 /setup.py
 ```
+
 8) podłącz konsole do wemosa
 ```
 picocom /dev/ttyUSB0 -b115200
 ```
+
 9) zresetuj wemosa, w konsoli powinienieś zobaczyć
 ```
 ets_task(40100130, 3, 3fff83ec, 4)
@@ -48,6 +53,7 @@ mqtt connected
 ('callback', b'home/light/E801-42602f00/info', b'online')
 ('callback', b'home/light/E801-42602f00/ip', b'192.168.24.102')
 ```
+
 10) sprawdź mqtt:
 ```
 mosquitto_sub -v -h adres.hosta.mqtt -t '#'
@@ -59,6 +65,7 @@ home/light/E801-42602f00/ip 192.168.24.102
 ```
 42602f00 to id Twojego esp8266, więc pewnie będzie inne....
 No dobrze, mamy działającego wemosa. Ale chcieliśmy H801! Teraz więc sprytna sztuczka
+
 11) zgraj zawartość flasha z wemosa do pliku
 ```
 esptool.py --port /dev/ttyUSB0 read_flash 0x00000 0x100000 to_801.bin
