@@ -54,4 +54,5 @@ def mqtt(cb):
     mqtt.connect()
     mqtt.subscribe(config.MQTT_TOPIC + b'/#')
     mqtt.publish(config.MQTT_TOPIC + b'/info', b'online', retain=True)
+    mqtt.publish(config.MQTT_TOPIC + b'/ip', wlan.ifconfig()[0], retain=True)
     print("mqtt connected")
