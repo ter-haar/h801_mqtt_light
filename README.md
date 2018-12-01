@@ -1,18 +1,11 @@
-# mqtt_light
-python driven mqtt rgb light switch
+# H801 micropython
+## Sterownik mqtt RGB led.
 
-ampy --port /dev/ttyUSB0 put /home/ter_haar/my_projects/micro_python/mqtt_light/config.py
-picocom /dev/ttyUSB0 -b115200
+Po co? Bo żaden z tych które znalazłem nie miał tego co potrzebowałem. Sterownik jest przeznaczony głównie dla H801 WiFi (ale zadziała na każdym układzie z esp8266) i pozwala sterować niezależnie każdym z kanałów. Można więc podłączyć pasek rgb i sterować nim, a zupełnie osobno sterować jeszcze dwoma paskami mono. Albo sterować osobno 5 paskami monohromatycznymi.
 
-mosquitto_sub -v -h 192.168.24.115 -t '#'
+Kod jest napisany w pythonie - chciałem sprawdzić jak python poradzi sobie w IoT na układzie z tak ograniczonymi zasobami.
 
-esptool.py --port /dev/ttyUSB0 erase_flash
-esptool.py --port /dev/ttyUSB0 read_flash 0x00000 0x100000 to_801
-esptool.py --port /dev/ttyUSB0 write_flash -fm dio 0x00000 to_801
-
-
-mosquitto_pub -h 192.168.24.115 -t home/light/5d916f00/file -m "http://192.168.24.111:8222/config.py"
-python -m SimpleHTTPServer 8222
-
-
-mosquitto_pub -h 192.168.24.115 -t home/light/5d916f00/cmd -m "exit"
+-------------------
+* [Opis instalacji](install_pl.md)
+* [Konfiguracja HomeAssistanta](hass_pl.md)
+* [Mqtt](mqtt_pl.md)
